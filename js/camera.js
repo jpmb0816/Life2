@@ -1,18 +1,11 @@
 class Camera {
-	constructor(ctx, cw, ch) {
+	constructor(canvas, ctx, map) {
+		this.canvas = canvas;
 		this.ctx = ctx;
-		this.cw = cw;
-		this.ch = ch;
-		this.mw = 0;
-		this.mh = 0;
+		this.map = map;
 		this.x = 0;
 		this.y = 0;
 		this.bindedTo = null;
-	}
-
-	setMapSize(w, h) {
-		this.mw = w;
-		this.mh = h;
 	}
 
 	// Update camera based on x and y
@@ -22,8 +15,8 @@ class Camera {
 		const y = entity.y + entity.height / 2;
 
 		// Camera x and y
-		const vx = -x + this.cw / 2;
-		const vy = -y + this.ch / 2;
+		const vx = -x + this.canvas.width / 2;
+		const vy = -y + this.canvas.height / 2;
 
 		// Clamping camera x and y so it prevents going out of map
 		// this.x = Tools.clamp(vx, -(this.mw - this.cw), 0);

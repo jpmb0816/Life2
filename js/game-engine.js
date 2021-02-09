@@ -20,12 +20,13 @@ class GameEngine {
 
 		this.interval = undefined;
 
-		this.object = new GameObject({ width: this.canvas.width * 2, height: this.canvas.height }, 1000, 100, 32, 32, 'red');
-		this.camera = new Camera(this.ctx, this.canvas.width, this.canvas.height);
-		this.camera.setMapSize(1200, 600);
+		this.map = { width: 300, height: this.canvas.height };
+
+		this.object = new GameObject(this.map, 150, 100, 32, 32, 'red');
+		this.camera = new Camera(this.canvas, this.ctx, this.map);
 		this.camera.bind(this.object);
 
-		this.buttons = [];
+		this.buttons = {};
 
 		this.initButtons();
 		this.initButtonsListeners();
@@ -51,24 +52,40 @@ class GameEngine {
 		this.keyManager = new KeyControlManager(window);
 		this.mouseManager = new MouseControlManager(window, this.canvas, this.isMobile);
 
+		this.isJustStarted = true;
+
 		// this.soundManager = new SoundManager();
 		// this.soundManager.add('bgm', 'sfx/bgm.mp3');
 	}
 
+	fullscreen() {
+		if (this.canvas.webkitRequestFullScreen) {
+			this.canvas.webkitRequestFullScreen();
+		}
+		else {
+			this.canvas.mozRequestFullScreen();
+		}
+	}
+
 	initButtons() {
-		this.buttons.push(new Button('Unmute', 150, 50, 70, 50, new Color(255, 0, 0)));
+		this.buttons.play = new Button('Play', 0, 0, 70, 50, new Color(255, 0, 0));
+		this.buttons.mute = new Button('Unmute', 150, 50, 70, 50, new Color(255, 0, 0));
 	}
 
 	initButtonsListeners() {
-		this.buttons[0].addOnMouseClickListener(() => {
+		this.buttons.play.addOnMouseClickListener(() => {
+			this.isJustStarted = false;
+			this.fullscreen();
+		});
+		this.buttons.mute.addOnMouseClickListener(() => {
 			if (this.isSoundMuted) {
 				this.isSoundMuted = false;
-				this.buttons[0].text = 'Mute';
+				this.buttons.mute.text = 'Mute';
 				this.bgm.play();
 			}
 			else {
 				this.isSoundMuted = true;
-				this.buttons[0].text = 'Unmute';
+				this.buttons.mute.text = 'Unmute';
 				this.bgm.pause();
 			}
 		});
@@ -91,47 +108,26 @@ class GameEngine {
 		const keyData = this.keyManager.getData();
 		const mouseData = this.mouseManager.getData();
 
-		this.buttons.forEach(button => {
-			button.update(mouseData, this.mouseManager.events);
-		});
-
-		// Update Game
-		this.object.update();
+		if (this.isJustStarted) {
+			this.updateStartingScreen(keyData, mouseData);
+		}
+		else {
+			this.updateInGameScreen(keyData, mouseData);
+		}
 	}
 	
 	render(ctx) {
+		const keyData = this.keyManager.getData();
 		const mouseData = this.mouseManager.getData();
 
-		// Clear canvas
-		ctx.fillStyle = 'black';
-		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		this.buttons.forEach(button => {
-			button.render(ctx);
-		});
-
-		// Render Game
-		this.camera.update();
-
-		ctx.fillStyle = 'green';
-		ctx.fillRect(0, 0, this.canvas.width * 2, this.canvas.height);
-
-		this.object.render(ctx);
-
-		this.camera.stop();
-
-		// Display UPS and FPS
-		ctx.font = '15px sans-serif';
-
-		ctx.textAlign = "start";
-		ctx.textBaseline = 'alphabetic';
-
-		ctx.fillStyle = 'yellow';
-		ctx.fillText('FPS: ' + this.FPS, 20, 30);
-		ctx.fillText('UPS: ' + this.UPS, 20, 50);
-
-		ctx.fillStyle = 'yellow';
-		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
+		if (this.isJustStarted) {
+			this.renderStartingScreen(this.ctx, keyData, mouseData);
+		}
+		else {
+			this.renderInGameScreen(this.ctx, keyData, mouseData);
+		}
 	}
 
 	getInput() {
@@ -174,5 +170,55 @@ class GameEngine {
 		this.targetFPS = targetFPS;
 		this.stop();
 		this.start();
+	}
+
+	// Starting Screen
+	updateStartingScreen(keyData, mouseData) {
+		this.buttons.play.update(mouseData, this.mouseManager.events);
+		this.buttons.play.x = (this.canvas.width / 2) - (this.buttons.play.width / 2);
+		this.buttons.play.y = (this.canvas.height / 2) - (this.buttons.play.height / 2);
+	}
+
+	renderStartingScreen(ctx, keyData, mouseData) {
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+		this.buttons.play.render(ctx);
+	}
+
+	// In Game Screen
+	updateInGameScreen(keyData, mouseData) {
+		this.buttons.mute.update(mouseData, this.mouseManager.events);
+
+		// Update Game
+		this.object.update();
+	}
+
+	renderInGameScreen(ctx, keyData, mouseData) {
+		ctx.fillStyle = 'black';
+		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+		// Render Game
+		this.camera.update();
+
+		ctx.fillStyle = 'green';
+		ctx.fillRect(0, 0, this.map.width, this.map.height);
+
+		this.object.render(ctx);
+
+		this.camera.stop();
+
+		// Display in screen
+		this.buttons.mute.render(ctx);
+
+		ctx.font = '15px sans-serif';
+		ctx.textAlign = "start";
+		ctx.textBaseline = 'alphabetic';
+		ctx.fillStyle = 'yellow';
+		ctx.fillText('FPS: ' + this.FPS, 20, 30);
+		ctx.fillText('UPS: ' + this.UPS, 20, 50);
+
+		ctx.fillStyle = 'yellow';
+		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
 	}
 }
