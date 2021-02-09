@@ -90,59 +90,68 @@ class Button {
 		this.isHover = false;
 	}
 
-	update(mouse) {
-		if (mouse.type === 'mousedown' && Tools.isPointCollidedToRect(mouse, this)) {
-			this.color.a = 0.5;
-
-			if (!this.isMouseDown) {
-				this.isMouseDown = true;
-
-				if (this.onMouseDownFunction) {
-					this.onMouseDownFunction();
-				}
-			}
-		}
-		else if (mouse.type === 'mouseup' && Tools.isPointCollidedToRect(mouse, this)) {
-			if (this.onMouseUpFunction) {
-				this.onMouseUpFunction();
-			}
-
-			if (this.isMouseDown) {
-				this.color.a = 1;
-				this.isMouseDown = false;
-
+	update(mouse, isMobile) {
+		if (isMobile) {
+			if (mouse.type === 'mousedown' && Tools.isPointCollidedToRect(mouse, this)) {
 				if (this.onMouseClickFunction) {
 					this.onMouseClickFunction();
 				}
 			}
 		}
-		else if (this.isMouseDown && mouse.type === 'mouseup') {
-			this.color.a = 1;
-			this.isMouseDown = false;
-		}
-		else if (this.isMouseDown) {
-			this.color.a = 0.5;
-			this.isMouseDown = true;
-		}
-		else if (Tools.isPointCollidedToRect({ x: mouse.cx, y: mouse.cy }, this)) {
-			this.color.a = 0.8;
+		else {
+			if (mouse.type === 'mousedown' && Tools.isPointCollidedToRect(mouse, this)) {
+				this.color.a = 0.5;
 
-			if (!this.isHover) {
-				this.isHover = true;
+				if (!this.isMouseDown) {
+					this.isMouseDown = true;
 
-				if (this.onMouseHoverInFunction) {
-					this.onMouseHoverInFunction();
+					if (this.onMouseDownFunction) {
+						this.onMouseDownFunction();
+					}
 				}
 			}
-		}
-		else {
-			this.color.a = 1;
+			else if (mouse.type === 'mouseup' && Tools.isPointCollidedToRect(mouse, this)) {
+				if (this.onMouseUpFunction) {
+					this.onMouseUpFunction();
+				}
 
-			if (this.isHover) {
-				this.isHover = false;
+				if (this.isMouseDown) {
+					this.color.a = 1;
+					this.isMouseDown = false;
 
-				if (this.onMouseHoverOutFunction) {
-					this.onMouseHoverOutFunction();
+					if (this.onMouseClickFunction) {
+						this.onMouseClickFunction();
+					}
+				}
+			}
+			else if (this.isMouseDown && mouse.type === 'mouseup') {
+				this.color.a = 1;
+				this.isMouseDown = false;
+			}
+			else if (this.isMouseDown) {
+				this.color.a = 0.5;
+				this.isMouseDown = true;
+			}
+			else if (Tools.isPointCollidedToRect({ x: mouse.cx, y: mouse.cy }, this)) {
+				this.color.a = 0.8;
+
+				if (!this.isHover) {
+					this.isHover = true;
+
+					if (this.onMouseHoverInFunction) {
+						this.onMouseHoverInFunction();
+					}
+				}
+			}
+			else {
+				this.color.a = 1;
+
+				if (this.isHover) {
+					this.isHover = false;
+
+					if (this.onMouseHoverOutFunction) {
+						this.onMouseHoverOutFunction();
+					}
 				}
 			}
 		}
