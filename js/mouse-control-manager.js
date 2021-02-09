@@ -1,11 +1,12 @@
 class MouseControlManager {
-	constructor(object, canvas) {
+	constructor(object, canvas, isMobile) {
 		this.canvas = canvas;
 		this.data = { type: '', code: -1, x: -1, y: -1, cx: -1, cy: -1 };
+		this.events = isMobile ? ['pointerdown', 'pointerup', 'pointermove'] : ['mousedown', 'mouseup', 'mousemove'];
 
-		object.addEventListener('mousedown', this.updateData.bind(this));
-		object.addEventListener('mouseup', this.updateData.bind(this));
-		object.addEventListener('mousemove', this.updateData.bind(this));
+		object.addEventListener(this.events[0], this.updateData.bind(this));
+		object.addEventListener(this.events[1], this.updateData.bind(this));
+		object.addEventListener(this.events[2], this.updateData.bind(this));
 	}
 
 	updateData(event) {
@@ -15,7 +16,7 @@ class MouseControlManager {
 
 		this.data.code = event.which;
 
-		if (event.type === 'mousemove') {
+		if (event.type === this.events[2]) {
 			this.data.cx = x;
 			this.data.cy = y;
 		}
@@ -27,7 +28,7 @@ class MouseControlManager {
 	}
 
 	resetData() {
-		if (this.data.type === 'mouseup') {
+		if (this.data.type === this.events[1]) {
 			this.data.type = '';
 			this.data.code = -1;
 		}
