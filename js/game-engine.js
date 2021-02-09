@@ -91,31 +91,31 @@ class GameEngine {
 		});
 
 		this.buttons.up.addOnMouseDownListener(() => {
-			this.player.vy = -this.player.speed;
+			this.player.move('up');
 		});
 		this.buttons.up.addOnMouseUpListener(() => {
-			this.player.vy = 0;
+			this.player.move('stop');
 		});
 
 		this.buttons.down.addOnMouseDownListener(() => {
-			this.player.vy = this.player.speed;
+			this.player.move('down');
 		});
 		this.buttons.down.addOnMouseUpListener(() => {
-			this.player.vy = 0;
+			this.player.move('stop');
 		});
 
 		this.buttons.left.addOnMouseDownListener(() => {
-			this.player.vx = -this.player.speed;
+			this.player.move('left');
 		});
 		this.buttons.left.addOnMouseUpListener(() => {
-			this.player.vx = 0;
+			this.player.move('stop');
 		});
 
 		this.buttons.right.addOnMouseDownListener(() => {
-			this.player.vx = this.player.speed;
+			this.player.move('right');
 		});
 		this.buttons.right.addOnMouseUpListener(() => {
-			this.player.vx = 0;
+			this.player.move('stop');
 		});
 	}
 
