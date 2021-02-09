@@ -63,12 +63,12 @@ class GameEngine {
 
 	initButtons() {
 		this.buttons.fullscreen = new Button('Fullscreen', 0, 0, 100, 50, new Color(255, 0, 0));
-		this.buttons.mute = new Button('Mute', 150, 50, 70, 50, new Color(255, 0, 0));
+		this.buttons.mute = new Button('Mute', 0, 50, 70, 50, new Color(255, 0, 0));
 
-		this.buttons.up = new Button('U', 150, 400, 50, 50, new Color(255, 0, 0));
-		this.buttons.down = new Button('D', 150, 500, 50, 50, new Color(255, 0, 0));
-		this.buttons.left = new Button('L', 100, 450, 50, 50, new Color(255, 0, 0));
-		this.buttons.right = new Button('R', 200, 450, 50, 50, new Color(255, 0, 0));
+		this.buttons.up = new Button('U', 100, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.down = new Button('D', 100, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.left = new Button('L', 50, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.right = new Button('R', 150, 0, 50, 50, new Color(255, 0, 0));
 	}
 
 	initButtonsListeners() {
@@ -251,11 +251,23 @@ class GameEngine {
 		ctx.textAlign = "start";
 		ctx.textBaseline = 'alphabetic';
 		ctx.fillStyle = 'yellow';
-		ctx.fillText('FPS: ' + this.FPS, 20, 30);
-		ctx.fillText('UPS: ' + this.UPS, 20, 50);
-
+		ctx.fillText('FPS: ' + this.FPS, 50, 50);
+		ctx.fillText('UPS: ' + this.UPS, 50, 80);
 
 		ctx.fillStyle = 'yellow';
 		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
+	}
+
+	// Adjust position based on canvas size
+	updatePositionOfInGameButtons() {
+		const width = this.canvas.width;
+		const height = this.canvas.height;
+
+		this.buttons.mute.x = width - this.buttons.mute.width - 50;
+
+		this.buttons.up.y = height - (this.buttons.down.height * 3) - 50;
+		this.buttons.down.y = height - this.buttons.down.height - 50;
+		this.buttons.left.y = height - (this.buttons.down.height * 2) - 50;
+		this.buttons.right.y = height - (this.buttons.down.height * 2) - 50;
 	}
 }
