@@ -100,6 +100,8 @@ class GameEngine {
 	}
 	
 	render(ctx) {
+		const mouseData = this.mouseManager.getData();
+
 		// Clear canvas
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -127,6 +129,9 @@ class GameEngine {
 		ctx.fillStyle = 'green';
 		ctx.fillText('FPS: ' + this.FPS, 20, 30);
 		ctx.fillText('UPS: ' + this.UPS, 20, 50);
+
+		ctx.fillStyle = 'yellow';
+		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
 	}
 
 	getInput() {
