@@ -6,8 +6,9 @@ class GameObject {
 		this.width = width;
 		this.height = height;
 		this.color = color;
-		this.vx = 1;
+		this.vx = 0;
 		this.vy = 0;
+		this.speed = 2;
 	}
 
 	update() {

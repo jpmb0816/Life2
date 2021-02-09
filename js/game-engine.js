@@ -22,24 +22,18 @@ class GameEngine {
 
 		this.map = { width: 300, height: this.canvas.height };
 
-		this.object = new GameObject(this.map, 150, 100, 32, 32, 'red');
+		this.player = new GameObject(this.map, 150, 100, 32, 32, 'red');
 		this.camera = new Camera(this.canvas, this.ctx, this.map);
-		this.camera.bind(this.object);
+		this.camera.bind(this.player);
 
 		this.buttons = {};
 
 		this.initButtons();
 		this.initButtonsListeners();
 
-		this.bgm = document.getElementById('bg-music');
-		this.isSoundMuted = true;
-
-		this.bgm.play().then(() => {
-			this.isSoundMuted = false;
-			this.buttons[0].text = 'Mute';
-		}).catch(error => {
-			
-		});
+		this.isSoundMuted = false;
+		this.bgm = new Audio('sfx/bgm.mp3');
+		this.bgm.loop = true;
 
 		this.isMobile = false;
 
@@ -52,7 +46,7 @@ class GameEngine {
 		this.keyManager = new KeyControlManager(window);
 		this.mouseManager = new MouseControlManager(window, this.canvas, this.isMobile);
 
-		this.isJustStarted = true;
+		this.isFullScreen = false;
 
 		// this.soundManager = new SoundManager();
 		// this.soundManager.add('bgm', 'sfx/bgm.mp3');
@@ -68,14 +62,20 @@ class GameEngine {
 	}
 
 	initButtons() {
-		this.buttons.play = new Button('Play', 0, 0, 70, 50, new Color(255, 0, 0));
-		this.buttons.mute = new Button('Unmute', 150, 50, 70, 50, new Color(255, 0, 0));
+		this.buttons.fullscreen = new Button('Fullscreen', 0, 0, 100, 50, new Color(255, 0, 0));
+		this.buttons.mute = new Button('Mute', 150, 50, 70, 50, new Color(255, 0, 0));
+
+		this.buttons.up = new Button('U', 150, 400, 50, 50, new Color(255, 0, 0));
+		this.buttons.down = new Button('D', 150, 500, 50, 50, new Color(255, 0, 0));
+		this.buttons.left = new Button('L', 100, 450, 50, 50, new Color(255, 0, 0));
+		this.buttons.right = new Button('R', 200, 450, 50, 50, new Color(255, 0, 0));
 	}
 
 	initButtonsListeners() {
-		this.buttons.play.addOnMouseClickListener(() => {
-			this.isJustStarted = false;
+		this.buttons.fullscreen.addOnMouseClickListener(() => {
+			this.isFullScreen = true;
 			this.fullscreen();
+			this.bgm.play();
 		});
 		this.buttons.mute.addOnMouseClickListener(() => {
 			if (this.isSoundMuted) {
@@ -88,6 +88,34 @@ class GameEngine {
 				this.buttons.mute.text = 'Unmute';
 				this.bgm.pause();
 			}
+		});
+
+		this.buttons.up.addOnMouseDownListener(() => {
+			this.player.vy = -this.player.speed;
+		});
+		this.buttons.up.addOnMouseUpListener(() => {
+			this.player.vy = 0;
+		});
+
+		this.buttons.down.addOnMouseDownListener(() => {
+			this.player.vy = this.player.speed;
+		});
+		this.buttons.down.addOnMouseUpListener(() => {
+			this.player.vy = 0;
+		});
+
+		this.buttons.left.addOnMouseDownListener(() => {
+			this.player.vx = -this.player.speed;
+		});
+		this.buttons.left.addOnMouseUpListener(() => {
+			this.player.vx = 0;
+		});
+
+		this.buttons.right.addOnMouseDownListener(() => {
+			this.player.vx = this.player.speed;
+		});
+		this.buttons.right.addOnMouseUpListener(() => {
+			this.player.vx = 0;
 		});
 	}
 
@@ -108,11 +136,11 @@ class GameEngine {
 		const keyData = this.keyManager.getData();
 		const mouseData = this.mouseManager.getData();
 
-		if (this.isJustStarted) {
-			this.updateStartingScreen(keyData, mouseData);
+		if (this.isFullScreen) {
+			this.updateInGameScreen(keyData, mouseData);
 		}
 		else {
-			this.updateInGameScreen(keyData, mouseData);
+			this.updateRequestFullScreen(keyData, mouseData);
 		}
 	}
 	
@@ -122,11 +150,11 @@ class GameEngine {
 
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		if (this.isJustStarted) {
-			this.renderStartingScreen(this.ctx, keyData, mouseData);
+		if (this.isFullScreen) {
+			this.renderInGameScreen(this.ctx, keyData, mouseData);
 		}
 		else {
-			this.renderInGameScreen(this.ctx, keyData, mouseData);
+			this.renderRequestFullScreen(this.ctx, keyData, mouseData);
 		}
 	}
 
@@ -172,26 +200,30 @@ class GameEngine {
 		this.start();
 	}
 
-	// Starting Screen
-	updateStartingScreen(keyData, mouseData) {
-		this.buttons.play.update(mouseData, this.mouseManager.events);
-		this.buttons.play.x = (this.canvas.width / 2) - (this.buttons.play.width / 2);
-		this.buttons.play.y = (this.canvas.height / 2) - (this.buttons.play.height / 2);
+	// RequestFull Screen
+	updateRequestFullScreen(keyData, mouseData) {
+		this.buttons.fullscreen.update(mouseData, this.mouseManager.events);
+		this.buttons.fullscreen.x = (this.canvas.width / 2) - (this.buttons.fullscreen.width / 2);
+		this.buttons.fullscreen.y = (this.canvas.height / 2) - (this.buttons.fullscreen.height / 2);
 	}
 
-	renderStartingScreen(ctx, keyData, mouseData) {
+	renderRequestFullScreen(ctx, keyData, mouseData) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-		this.buttons.play.render(ctx);
+		this.buttons.fullscreen.render(ctx);
 	}
 
 	// In Game Screen
 	updateInGameScreen(keyData, mouseData) {
 		this.buttons.mute.update(mouseData, this.mouseManager.events);
+		this.buttons.up.update(mouseData, this.mouseManager.events);
+		this.buttons.down.update(mouseData, this.mouseManager.events);
+		this.buttons.left.update(mouseData, this.mouseManager.events);
+		this.buttons.right.update(mouseData, this.mouseManager.events);
 
 		// Update Game
-		this.object.update();
+		this.player.update();
 	}
 
 	renderInGameScreen(ctx, keyData, mouseData) {
@@ -204,12 +236,16 @@ class GameEngine {
 		ctx.fillStyle = 'green';
 		ctx.fillRect(0, 0, this.map.width, this.map.height);
 
-		this.object.render(ctx);
+		this.player.render(ctx);
 
 		this.camera.stop();
 
 		// Display in screen
 		this.buttons.mute.render(ctx);
+		this.buttons.up.render(ctx);
+		this.buttons.down.render(ctx);
+		this.buttons.left.render(ctx);
+		this.buttons.right.render(ctx);
 
 		ctx.font = '15px sans-serif';
 		ctx.textAlign = "start";
@@ -217,6 +253,7 @@ class GameEngine {
 		ctx.fillStyle = 'yellow';
 		ctx.fillText('FPS: ' + this.FPS, 20, 30);
 		ctx.fillText('UPS: ' + this.UPS, 20, 50);
+
 
 		ctx.fillStyle = 'yellow';
 		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
