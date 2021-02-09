@@ -6,23 +6,15 @@ window.addEventListener('resize', () => {
 	resizeCanvas();
 });
 
-// ['', 'webkit', 'moz', 'ms'].forEach(prefix => window.addEventListener(prefix + 'fullscreenchange', fullScreenChange, false));
-
 function resizeCanvas() {
 	engine.canvas.width = window.innerWidth;
 	engine.canvas.height = window.innerHeight;
 
-	if (screen.width !== window.innerWidth){
+	if (document.fullscreenElement === null) {
 		engine.isFullScreen = false;
 		engine.bgm.pause();
 	}
 }
-
-// function fullScreenChange() {
-// 	if (engine.isFullScreen) {
-// 		engine.bgm.pause();
-// 	}
-// }
 
 function preload() {
 	init();
