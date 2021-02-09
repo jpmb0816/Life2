@@ -126,7 +126,7 @@ class GameEngine {
 		ctx.textAlign = "start";
 		ctx.textBaseline = 'alphabetic';
 
-		ctx.fillStyle = 'white';
+		ctx.fillStyle = 'yellow';
 		ctx.fillText('FPS: ' + this.FPS, 20, 30);
 		ctx.fillText('UPS: ' + this.UPS, 20, 50);
 
