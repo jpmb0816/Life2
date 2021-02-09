@@ -1,17 +1,18 @@
 class GameObject {
-	constructor(x, y, width, height, color) {
+	constructor(map, x, y, width, height, color) {
+		this.map = map;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.color = color;
 		this.vx = 1;
-		this.vy = 1;
+		this.vy = 0;
 	}
 
 	update() {
-		this.x = Tools.clamp(this.x + this.vx, 0, canvas.width - this.width);
-		this.y = Tools.clamp(this.y + this.vy, 0, canvas.height - this.height);
+		this.x = Tools.clamp(this.x + this.vx, 0, this.map.width - this.width);
+		this.y = Tools.clamp(this.y + this.vy, 0, this.map.height - this.height);
 	}
 
 	render(ctx) {

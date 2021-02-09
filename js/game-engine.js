@@ -1,6 +1,6 @@
 class GameEngine {
 	constructor() {
-		this.canvas = document.getElementById('canvas');
+		this.canvas = document.getElementById('screen-canvas');
 		this.ctx = this.canvas.getContext('2d');
 
 		this.lastTime = Tools.getCurrentTimeMillis();
@@ -22,52 +22,48 @@ class GameEngine {
 		this.keyState = [];
 
 		this.keyManager = new KeyControlManager(window);
-		this.mouseManager = new MouseControlManager(window, canvas);
+		this.mouseManager = new MouseControlManager(window, this.canvas);
+
+		this.object = new GameObject({ width: this.canvas.width * 2, height: this.canvas.height }, 1000, 100, 32, 32, 'red');
+		this.camera = new Camera(this.ctx, this.canvas.width, this.canvas.height);
+		this.camera.setMapSize(1200, 600);
+		this.camera.bind(this.object);
 
 		this.buttons = [];
 
 		this.initButtons();
 		this.initButtonsListeners();
+
+		this.bgm = document.getElementById('bg-music');
+		this.isSoundMuted = true;
+
+		this.bgm.play().then(() => {
+			this.isSoundMuted = false;
+			this.buttons[0].text = 'Mute';
+		}).catch(error => {
+			
+		});
+
+		// this.soundManager = new SoundManager();
+		// this.soundManager.add('bgm', 'sfx/bgm.mp3');
 	}
 
 	initButtons() {
-		this.buttons.push(new Button('Start', 50, 50, 100, 50, new Color(255, 0, 0)));
-		this.buttons.push(new Button('Restart', 200, 50, 100, 50, new Color(255, 100, 0)));
+		this.buttons.push(new Button('Unmute', 150, 50, 70, 50, new Color(255, 0, 0)));
 	}
 
 	initButtonsListeners() {
-		// this.buttons[0].addOnMouseDownListener(() => {
-		// 	console.log('mousedown');
-		// });
-		// this.buttons[0].addOnMouseUpListener(() => {
-		// 	console.log('mouseup');
-		// });
-		// this.buttons[0].addOnMouseClickListener(() => {
-		// 	console.log('clicked');
-		// });
-		// this.buttons[0].addOnMouseHoverInListener(() => {
-		// 	console.log('hoverin');
-		// });
-		// this.buttons[0].addOnMouseHoverOutListener(() => {
-		// 	console.log('hoverout');
-		// });
-
-		this.buttons.forEach(button => {
-			button.addOnMouseDownListener(() => {
-				console.log(button.text + 'mousedown');
-			});
-			button.addOnMouseUpListener(() => {
-				console.log(button.text + 'mouseup');
-			});
-			button.addOnMouseClickListener(() => {
-				console.log(button.text + 'clicked');
-			});
-			button.addOnMouseHoverInListener(() => {
-				console.log(button.text + 'hoverin');
-			});
-			button.addOnMouseHoverOutListener(() => {
-				console.log(button.text + 'hoverout');
-			});
+		this.buttons[0].addOnMouseClickListener(() => {
+			if (this.isSoundMuted) {
+				this.isSoundMuted = false;
+				this.buttons[0].text = 'Mute';
+				this.bgm.play();
+			}
+			else {
+				this.isSoundMuted = true;
+				this.buttons[0].text = 'Unmute';
+				this.bgm.pause();
+			}
 		});
 	}
 
@@ -91,6 +87,9 @@ class GameEngine {
 		this.buttons.forEach(button => {
 			button.update(mouseData);
 		});
+
+		// Update Game
+		this.object.update();
 	}
 	
 	render(ctx) {
@@ -98,10 +97,19 @@ class GameEngine {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-		// Render Game
 		this.buttons.forEach(button => {
 			button.render(ctx);
 		});
+
+		// Render Game
+		this.camera.update();
+
+		ctx.fillStyle = 'green';
+		ctx.fillRect(0, 0, this.canvas.width * 2, this.canvas.height);
+
+		this.object.render(ctx);
+
+		this.camera.stop();
 
 		// Display UPS and FPS
 		ctx.font = '15px sans-serif';

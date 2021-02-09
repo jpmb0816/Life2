@@ -1,12 +1,12 @@
-document.getElementById('water-music').play().then(() => {
-	
-}).catch(error => {
-	
-});
 
-function play() {
-	document.getElementById('water-music').play();
+const engine = new GameEngine();
+
+function preload() {
+	init();
 }
 
-const engine = new GameEngine(this);
-engine.start();
+function init() {
+	engine.start();
+}
+
+preload();
