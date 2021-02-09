@@ -2,7 +2,7 @@ class MouseControlManager {
 	constructor(object, canvas, isMobile) {
 		this.canvas = canvas;
 		this.data = { type: '', code: -1, x: -1, y: -1, cx: -1, cy: -1 };
-		this.events = isMobile ? ['pointerdown', 'pointerup', 'pointermove'] : ['mousedown', 'mouseup', 'mousemove'];
+		this.events = isMobile ? ['touchdown', 'touchup', 'touchmove'] : ['mousedown', 'mouseup', 'mousemove'];
 
 		object.addEventListener(this.events[0], this.updateData.bind(this));
 		object.addEventListener(this.events[1], this.updateData.bind(this));
