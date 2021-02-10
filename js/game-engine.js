@@ -46,6 +46,7 @@ class GameEngine {
 		this.mouseManager = new MouseControlManager(window, this.canvas, this.isMobile);
 
 		this.isFullScreen = false;
+		this.isResize = true;
 	}
 
 	fullscreen() {
@@ -59,15 +60,31 @@ class GameEngine {
 
 	initButtons() {
 		this.buttons.fullscreen = new Button('Fullscreen', 0, 0, 100, 50, new Color(255, 0, 0));
-		this.buttons.mute = new Button('Mute', 0, 50, 70, 50, new Color(255, 0, 0));
+		this.buttons.fullscreen.setXAlign('center');
+		this.buttons.fullscreen.setYAlign('center');
 
-		this.buttons.up = new Button('U', 100, 0, 50, 50, new Color(255, 0, 0));
-		this.buttons.down = new Button('D', 100, 0, 50, 50, new Color(255, 0, 0));
-		this.buttons.left = new Button('L', 50, 0, 50, 50, new Color(255, 0, 0));
-		this.buttons.right = new Button('R', 150, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.mute = new Button('Mute', 0, 0, 70, 50, new Color(255, 0, 0));
+		this.buttons.mute.setXAlign('right');
 
-		this.buttons.a = new Button('A', 0, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.up = new Button('U', 50, 100, 50, 50, new Color(255, 0, 0));
+		this.buttons.up.setYAlign('bottom');
+
+		this.buttons.down = new Button('D', 50, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.down.setYAlign('bottom');
+
+		this.buttons.left = new Button('L', 0, 50, 50, 50, new Color(255, 0, 0));
+		this.buttons.left.setYAlign('bottom');
+
+		this.buttons.right = new Button('R', 100, 50, 50, 50, new Color(255, 0, 0));
+		this.buttons.right.setYAlign('bottom');
+
+		this.buttons.a = new Button('A', 50, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.a.setXAlign('right');
+		this.buttons.a.setYAlign('bottom');
+
 		this.buttons.b = new Button('B', 0, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.b.setXAlign('right');
+		this.buttons.b.setYAlign('bottom');
 	}
 
 	initButtonsListeners() {
@@ -142,6 +159,19 @@ class GameEngine {
 		const keyData = this.keyManager.getData();
 		const mouseData = this.mouseManager.getData();
 
+		if (this.isResize) {
+			this.isResize = false;
+			this.canvas.width = window.innerWidth;
+			this.canvas.height = window.innerHeight;
+
+			this.updatePositionOfInGameButtons();
+
+			if (document.fullscreenElement === null) {
+				this.isFullScreen = false;
+				this.bgm.pause();
+			}
+		}
+
 		if (this.isFullScreen) {
 			this.updateInGameDisplay(keyData, mouseData);
 		}
@@ -209,8 +239,6 @@ class GameEngine {
 	// Request fullscreen display
 	updateRequestFullScreenDisplay(keyData, mouseData) {
 		this.buttons.fullscreen.update(mouseData, this.mouseManager.events);
-		this.buttons.fullscreen.x = (this.canvas.width / 2) - (this.buttons.fullscreen.width / 2);
-		this.buttons.fullscreen.y = (this.canvas.height / 2) - (this.buttons.fullscreen.height / 2);
 	}
 
 	renderRequestFullScreenDisplay(ctx, keyData, mouseData) {
@@ -269,19 +297,19 @@ class GameEngine {
 
 	// Adjust position based on canvas size
 	updatePositionOfInGameButtons() {
-		const width = this.canvas.width;
-		const height = this.canvas.height;
+		if (this.isFullScreen) {
+			this.buttons.mute.reposition(this.canvas);
 
-		this.buttons.mute.x = width - this.buttons.mute.width - 50;
+			this.buttons.up.reposition(this.canvas);
+			this.buttons.down.reposition(this.canvas);
+			this.buttons.left.reposition(this.canvas);
+			this.buttons.right.reposition(this.canvas);
 
-		this.buttons.up.y = height - (this.buttons.down.height * 3) - 50;
-		this.buttons.down.y = height - this.buttons.down.height - 50;
-		this.buttons.left.y = height - (this.buttons.down.height * 2) - 50;
-		this.buttons.right.y = height - (this.buttons.down.height * 2) - 50;
-
-		this.buttons.a.x = width - (this.buttons.down.width * 2.5) - 50;
-		this.buttons.a.y = height - (this.buttons.down.height * 2) - 50;
-		this.buttons.b.x = width - this.buttons.down.width - 50;
-		this.buttons.b.y = height - (this.buttons.down.height * 2) - 50;
+			this.buttons.a.reposition(this.canvas);
+			this.buttons.b.reposition(this.canvas);
+		}
+		else {
+			this.buttons.fullscreen.reposition(this.canvas);
+		}
 	}
 }

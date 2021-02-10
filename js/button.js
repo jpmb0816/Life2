@@ -3,9 +3,16 @@ class Button {
 		this.text = text;
 		this.x = x;
 		this.y = y;
+		this.ox = x;
+		this.oy = y;
 		this.width = width;
 		this.height = height;
 		this.color = color;
+		this.xAlign = 'left';
+		this.yAlign = 'top';
+
+		this.isVisible = true;
+
 		this.onMouseDownFunction = undefined;
 		this.onMouseUpFunction = undefined;
 		this.onMouseClickFunction = undefined;
@@ -91,6 +98,10 @@ class Button {
 	}
 
 	update(mouse, events) {
+		if (!this.isVisible) {
+			return;
+		}
+
 		if (mouse.type === events[0] && Tools.isPointCollidedToRect(mouse, this)) {
 			this.color.a = 0.5;
 
@@ -149,6 +160,10 @@ class Button {
 	}
 
 	render(ctx) {
+		if (!this.isVisible) {
+			return;
+		}
+
 		ctx.fillStyle = this.color.toString();
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 
@@ -159,5 +174,53 @@ class Button {
 		ctx.textBaseline = 'middle';
 
 		ctx.fillText(this.text, this.x + (this.width / 2), this.y + (this.height / 2));
+	}
+
+	setCoordinate(x, y) {
+		this.ox = x;
+		this.oy = y;
+	}
+
+	setXAlign(xAlign) {
+		if (xAlign === 'left' || xAlign === 'center' || xAlign === 'right') {
+			this.xAlign = xAlign.toLowerCase();
+		}
+		else {
+			this.xAlign = 'left';
+		}
+	}
+
+	setYAlign(yAlign) {
+		if (yAlign === 'top' || yAlign === 'center' || yAlign === 'bottom') {
+			this.yAlign = yAlign.toLowerCase();
+		}
+		else {
+			this.yAlign = 'top';
+		}
+	}
+
+	reposition(canvas) {
+		const width = canvas.width;
+		const height = canvas.height;
+
+		if (this.xAlign === 'left') {
+			this.x = this.ox;
+		}
+		else if (this.xAlign === 'center') {
+			this.x = (width / 2) - (this.width / 2) + this.ox;
+		}
+		else if (this.xAlign === 'right') {
+			this.x = width - this.width - this.ox;
+		}
+
+		if (this.xAlign === 'top') {
+			this.y = this.oy;
+		}
+		else if (this.yAlign === 'center') {
+			this.y = (height / 2) - (this.height / 2) + this.oy;
+		}
+		else if (this.yAlign === 'bottom') {
+			this.y = height - this.height - this.oy;
+		}
 	}
 }

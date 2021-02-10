@@ -1,22 +1,9 @@
 
 const engine = new GameEngine();
-resizeCanvas();
 
 window.addEventListener('resize', () => {
-	resizeCanvas();
+	engine.isResize = true;
 });
-
-function resizeCanvas() {
-	engine.canvas.width = window.innerWidth;
-	engine.canvas.height = window.innerHeight;
-
-	engine.updatePositionOfInGameButtons();
-
-	if (document.fullscreenElement === null) {
-		engine.isFullScreen = false;
-		engine.bgm.pause();
-	}
-}
 
 function preload() {
 	init();
