@@ -3,7 +3,7 @@ class MouseControlManager {
 		this.canvas = canvas;
 		this.data = { type: '', code: -1, x: -1, y: -1, cx: -1, cy: -1 };
 		this.isMobile = isMobile;
-		this.events = isMobile ? ['pointerdown', 'pointerup', 'touchmove'] : ['mousedown', 'mouseup', 'mousemove'];
+		this.events = isMobile ? ['touchstart', 'touchend', 'touchmove'] : ['mousedown', 'mouseup', 'mousemove'];
 
 		object.addEventListener(this.events[0], this.updateData.bind(this));
 		object.addEventListener(this.events[1], this.updateData.bind(this));
@@ -14,9 +14,15 @@ class MouseControlManager {
 		const rect = this.canvas.getBoundingClientRect();
 		let x, y;
 
-		if (this.isMobile && event.type === this.events[2]) {
-			x = Math.round(event.touches[0].clientX - rect.left);
-			y = Math.round(event.touches[0].clientY - rect.top);
+		if (this.isMobile) {
+			if (event.type === this.events[1]) {
+				x = Math.round(event.changedTouches[0].clientX - rect.left);
+				y = Math.round(event.changedTouches[0].clientY - rect.top);
+			}
+			else {
+				x = Math.round(event.touches[0].clientX - rect.left);
+				y = Math.round(event.touches[0].clientY - rect.top);
+			}
 		}
 		else {
 			x = Math.round(event.clientX - rect.left);

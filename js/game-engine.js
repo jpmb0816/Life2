@@ -42,14 +42,10 @@ class GameEngine {
 			this.isMobile = true;
 		}
 
-		// this.keyState = [];
 		this.keyManager = new KeyControlManager(window);
 		this.mouseManager = new MouseControlManager(window, this.canvas, this.isMobile);
 
 		this.isFullScreen = false;
-
-		// this.soundManager = new SoundManager();
-		// this.soundManager.add('bgm', 'sfx/bgm.mp3');
 	}
 
 	fullscreen() {
@@ -69,6 +65,9 @@ class GameEngine {
 		this.buttons.down = new Button('D', 100, 0, 50, 50, new Color(255, 0, 0));
 		this.buttons.left = new Button('L', 50, 0, 50, 50, new Color(255, 0, 0));
 		this.buttons.right = new Button('R', 150, 0, 50, 50, new Color(255, 0, 0));
+
+		this.buttons.a = new Button('A', 0, 0, 50, 50, new Color(255, 0, 0));
+		this.buttons.b = new Button('B', 0, 0, 50, 50, new Color(255, 0, 0));
 	}
 
 	initButtonsListeners() {
@@ -117,6 +116,13 @@ class GameEngine {
 		this.buttons.right.addOnMouseUpListener(() => {
 			this.player.move('stop');
 		});
+
+		this.buttons.a.addOnMouseClickListener(() => {
+			console.log('A');
+		});
+		this.buttons.b.addOnMouseClickListener(() => {
+			console.log('B')
+		});
 	}
 
 	start() {
@@ -137,10 +143,10 @@ class GameEngine {
 		const mouseData = this.mouseManager.getData();
 
 		if (this.isFullScreen) {
-			this.updateInGameScreen(keyData, mouseData);
+			this.updateInGameDisplay(keyData, mouseData);
 		}
 		else {
-			this.updateRequestFullScreen(keyData, mouseData);
+			this.updateRequestFullScreenDisplay(keyData, mouseData);
 		}
 	}
 	
@@ -151,10 +157,10 @@ class GameEngine {
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		if (this.isFullScreen) {
-			this.renderInGameScreen(this.ctx, keyData, mouseData);
+			this.renderInGameDisplay(this.ctx, keyData, mouseData);
 		}
 		else {
-			this.renderRequestFullScreen(this.ctx, keyData, mouseData);
+			this.renderRequestFullScreenDisplay(this.ctx, keyData, mouseData);
 		}
 	}
 
@@ -200,33 +206,36 @@ class GameEngine {
 		this.start();
 	}
 
-	// RequestFull Screen
-	updateRequestFullScreen(keyData, mouseData) {
+	// Request fullscreen display
+	updateRequestFullScreenDisplay(keyData, mouseData) {
 		this.buttons.fullscreen.update(mouseData, this.mouseManager.events);
 		this.buttons.fullscreen.x = (this.canvas.width / 2) - (this.buttons.fullscreen.width / 2);
 		this.buttons.fullscreen.y = (this.canvas.height / 2) - (this.buttons.fullscreen.height / 2);
 	}
 
-	renderRequestFullScreen(ctx, keyData, mouseData) {
+	renderRequestFullScreenDisplay(ctx, keyData, mouseData) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 		this.buttons.fullscreen.render(ctx);
 	}
 
-	// In Game Screen
-	updateInGameScreen(keyData, mouseData) {
+	// In game display
+	updateInGameDisplay(keyData, mouseData) {
 		this.buttons.mute.update(mouseData, this.mouseManager.events);
 		this.buttons.up.update(mouseData, this.mouseManager.events);
 		this.buttons.down.update(mouseData, this.mouseManager.events);
 		this.buttons.left.update(mouseData, this.mouseManager.events);
 		this.buttons.right.update(mouseData, this.mouseManager.events);
 
+		this.buttons.a.update(mouseData, this.mouseManager.events);
+		this.buttons.b.update(mouseData, this.mouseManager.events);
+
 		// Update Game
 		this.player.update();
 	}
 
-	renderInGameScreen(ctx, keyData, mouseData) {
+	renderInGameDisplay(ctx, keyData, mouseData) {
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -247,15 +256,15 @@ class GameEngine {
 		this.buttons.left.render(ctx);
 		this.buttons.right.render(ctx);
 
+		this.buttons.a.render(ctx);
+		this.buttons.b.render(ctx);
+
 		ctx.font = '15px sans-serif';
 		ctx.textAlign = "start";
 		ctx.textBaseline = 'alphabetic';
 		ctx.fillStyle = 'yellow';
 		ctx.fillText('FPS: ' + this.FPS, 50, 50);
 		ctx.fillText('UPS: ' + this.UPS, 50, 80);
-
-		ctx.fillStyle = 'yellow';
-		ctx.fillRect(mouseData.cx, mouseData.cy, 5, 5);
 	}
 
 	// Adjust position based on canvas size
@@ -269,5 +278,10 @@ class GameEngine {
 		this.buttons.down.y = height - this.buttons.down.height - 50;
 		this.buttons.left.y = height - (this.buttons.down.height * 2) - 50;
 		this.buttons.right.y = height - (this.buttons.down.height * 2) - 50;
+
+		this.buttons.a.x = width - (this.buttons.down.width * 2.5) - 50;
+		this.buttons.a.y = height - (this.buttons.down.height * 2) - 50;
+		this.buttons.b.x = width - this.buttons.down.width - 50;
+		this.buttons.b.y = height - (this.buttons.down.height * 2) - 50;
 	}
 }
